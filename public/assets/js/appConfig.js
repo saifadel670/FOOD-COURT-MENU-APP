@@ -5,7 +5,7 @@
  */
 const appConfig = {
     // API Endpoint
-    API_URL: 'https://mocki.io/v1/f958305b-2055-4d4b-97b4-c4b7eb870334',
+    API_URL: 'https://hariken.xyz/food-court-menu-flat.json',
 
     defaultBanner: '/assets/images/default-banner.jpg',
     
