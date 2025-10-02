@@ -119,10 +119,37 @@ const App = {
         const filteredItems = this.restaurants.filter(item => item.id === restaurantId);
         const menu = filteredItems[0]?.items || []
         menuRenderer.renderMenuItems(menu);
+    },
+
+    enterSearchMode: function() {
+        const appContainer = document.querySelector('.app-container');
+        const backButton = document.getElementById('back-button');
+        const searchInput = document.getElementById('search-input');
+    
+        appContainer.classList.add('search-active');
+        backButton.style.display = 'flex';
+        searchInput.focus(); // focus again if user tapped quickly
+    },
+    
+    exitSearchMode: function() {
+        const appContainer = document.querySelector('.app-container');
+        const backButton = document.getElementById('back-button');
+        const searchInput = document.getElementById('search-input');
+    
+        appContainer.classList.remove('search-active');
+        backButton.style.display = 'none';
+        searchInput.blur(); // remove keyboard
+    
+        // Clear search text and reset list
+        searchInput.value = '';
+        menuRenderer.filterMenu();
     }
+    
 };
 
 // Start the application when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });
+
+window.App = App;

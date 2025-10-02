@@ -265,6 +265,40 @@ body {
     white-space: nowrap;
 }
 
+/* Back Button */
+.back-button {
+    border: none;
+    background: none;
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+    margin-right: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* When search mode is active, move search bar to top */
+.search-active .header-bg,
+.search-active .tabs-container {
+    display: none;
+}
+
+.search-active .search-bar-container {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Optional smooth animation */
+.app-container {
+    transition: all 0.3s ease;
+}
+
+
 /* * SHIMMER LOADING EFFECT STYLES
   */
 .shimmer-wrapper {

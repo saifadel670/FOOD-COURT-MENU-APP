@@ -7,7 +7,7 @@ import { appConfig } from './appConfig.js';
 
 const menuService = {
     fetchMenuData: async function() {
-        console.log(`DEBUG: Attempting to fetch from URL: ${appConfig.API_URL}`);
+        console.log('DEBUG: Attempting to fetch from URL: ${appConfig.API_URL}');
         try {
             const response = await fetch(appConfig.API_URL);
 

@@ -33,8 +33,14 @@
         <!-- Search Bar -->
         <div class="search-bar-container">
             <div class="search-input-group">
-                <!-- Placeholder text now set by JavaScript -->
-                <input type="text" id="search-input" class="search-input" placeholder="" oninput="menuRenderer.filterMenu()">
+                <!-- Back Button (hidden initially) -->
+                <button id="back-button" class="back-button" onclick="App.exitSearchMode()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <input type="text" id="search-input" class="search-input" placeholder="" 
+                    onfocus="App.enterSearchMode()" 
+                    oninput="menuRenderer.filterMenu()">
                 <i class="fas fa-search search-icon"></i>
             </div>
         </div>
