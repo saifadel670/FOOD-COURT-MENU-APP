@@ -152,9 +152,6 @@ body {
     padding-top: 10px;
     padding-bottom: 0;
     background-color: white;
-    /** Ensure search bar has white background */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    /** subtle separator */
 }
 
 .search-input-group {
@@ -188,8 +185,16 @@ body {
 
 /* * MENU LIST STYLING
   */
+
+.menu-group-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 16px 0 8px 16px; /* top 16px, bottom 8px, left 16px */
+    color: #333;
+}
+
 .menu-list {
-    padding: 20px;
+    padding: 16px;
     padding-top: 15px;
     margin-top: 0;
 }

@@ -5,7 +5,9 @@
  */
 const appConfig = {
     // API Endpoint
-    API_URL: 'https://mocki.io/v1/ed02f06d-dfa4-4915-88fe-ddca27948c8b',
+    API_URL: 'https://mocki.io/v1/f958305b-2055-4d4b-97b4-c4b7eb870334',
+
+    defaultBanner: '/assets/images/default-banner.jpg',
     
     // UI Text
     APP_TITLE: 'Food Court Central',

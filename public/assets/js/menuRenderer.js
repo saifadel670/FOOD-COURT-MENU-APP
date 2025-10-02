@@ -90,25 +90,60 @@ const menuRenderer = {
      * This function is connected to the HTML <input>'s oninput event.
      */
     filterMenu: function() {
-        const query = searchInput.value.toLowerCase().trim();
-
-        if (query === '') {
-            // If search is empty, show all items for the current tab
-            this.displayItems(currentRenderedItems);
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+    
+        if (!App.isSearching) return; // only filter when in search mode
+    
+        if (!query) {
+            // empty input → show empty menu during search
+            this.renderMenuItems([]);
             return;
         }
-
-        const filtered = currentRenderedItems.filter(item => 
-            item.title.toLowerCase().includes(query) ||
-            item.description.toLowerCase().includes(query)
-        );
-
-        // If no items match the filter, render a "No Results" message
-        if (filtered.length === 0) {
-            this.renderNoData('No Results', `No items found matching "${query}" in the active menu.`);
-        } else {
-            this.displayItems(filtered);
+    
+        // filter across all restaurants
+        const groupedResults = App.restaurants.map(r => {
+            const matchedItems = r.items.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                (item.tags || []).some(tag => tag.toLowerCase().includes(query))
+            );
+            return { ...r, items: matchedItems };
+        }).filter(r => r.items.length > 0);
+    
+        if (groupedResults.length === 0) {
+            this.renderNoData('No Results', `No items found matching "${query}"`);
+            return;
         }
+    
+        // Render grouped results
+        let html = '';
+        groupedResults.forEach(r => {
+            html += `<h3 class="menu-group-title">${r.name}</h3>`;
+            html += this.generateItemsHTML(r.items);
+        });
+        document.getElementById('menu-area').innerHTML = html;
+    },
+    
+    // helper to generate menu HTML (reuse your existing card markup)
+    generateItemsHTML: function(items) {
+        let html = '<div class="menu-list">';
+        items.forEach(item => {
+            html += `
+                <div class="menu-item-card">
+                    <div class="item-image-container">
+                        <img src="${item.image || 'https://placehold.co/80x80/cccccc/333333?text=FOOD'}"
+                             alt="${item.title}" class="item-image"
+                             onerror="this.onerror=null;this.src='https://placehold.co/80x80/cccccc/333333?text=FOOD'">
+                    </div>
+                    <div class="item-details">
+                        <h4 class="item-name">${item.title}</h4>
+                        <p class="item-description">${item.description}</p>
+                    </div>
+                    <div class="item-price">৳ ${(item.price || 0).toFixed(0)}</div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        return html;
     },
 
     /**
