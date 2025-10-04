@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Food Court Central - Dynamic API</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Header Section -->
+        <header class="header-bg">
+            <div class="header-content">
+                <h1 id="app-title" class="header-title"></h1>
+                <p id="app-subtitle" class="header-subtitle"></p>
+            </div>
+
+            <!-- Dynamic Restaurant Tabs -->
+            <nav id="tabs-container" class="tabs-container"></nav>
+        </header>
+
+        <!-- Search Bar -->
+        <section class="search-bar-container">
+            <div class="search-input-group">
+                <button id="back-button" class="back-button" onclick="App.exitSearchMode()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <input type="text" id="search-input" class="search-input" placeholder="" onfocus="App.enterSearchMode()"
+                    oninput="menuRenderer.filterMenu()" />
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </section>
+
+        <!-- Menu List -->
+        <main id="menu-area"></main>
+
+    </div>
+
+    <!-- Main App Script -->
+    <script type="module" src="assets/js/app.js"></script>
+</body>
+
+</html>

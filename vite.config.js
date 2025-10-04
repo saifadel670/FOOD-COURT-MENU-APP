@@ -1,13 +1,12 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite'
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/style.css', 'resources/js/app.js'],
-            refresh: true,
-        }),
-        tailwindcss(),
-    ],
-});
+  root: 'public',         // Vite serves from this folder
+  build: {
+    outDir: '../dist'     // Output build folder
+  },
+  server: {
+    port: 8000,
+    open: true
+  }
+})
