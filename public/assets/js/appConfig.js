@@ -6,11 +6,9 @@
 const appConfig = {
     // API Endpoint
     API_URL: 'https://api.hariken.xyz/food-court-by-slug',
-
-    defaultBanner: '/assets/images/default-banner.jpg',
     
     // UI Text
-    APP_TITLE: 'Food Court Central',
+    APP_TITLE: 'Digital Food Court',
     APP_SUBTITLE: 'Taste the Variety',
     SEARCH_PLACEHOLDER: 'Search menu items...',
     
@@ -18,7 +16,8 @@ const appConfig = {
     SHIMMER_COUNT: 5, // Number of shimmer cards to display during loading
     
     // Error Handling
-    API_ERROR_MESSAGE: 'Could not connect to the menu server. Please check your connection.',
+    EMPTY_DATA_ERROR_MESSAGE: "No menu items available at the moment. Please check back later.",
+    API_ERROR_MESSAGE: 'We’re having some trouble right now. Please check your internet connection or try again shortly.',
 };
 
 export { appConfig };

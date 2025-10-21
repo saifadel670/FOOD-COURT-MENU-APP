@@ -31,8 +31,7 @@ const menuService = {
 
     } catch (error) {
       console.error("Fetch API Error:", error);
-      // Return an empty, standardized structure on failure
-      return { restaurants: {}, items: [] };
+      throw error;
     }
   }
 };

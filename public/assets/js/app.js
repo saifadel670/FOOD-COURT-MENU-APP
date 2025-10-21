@@ -10,175 +10,188 @@ import { menuRenderer } from './menuRenderer.js';
 window.menuRenderer = menuRenderer; // Expose globally for inline events
 
 const App = {
-  restaurants: [],
-  selectedRestaurantSlug: null,
-  isSearching: false,
+    restaurants: [],
+    selectedRestaurantSlug: null,
+    isSearching: false,
 
-  /**
-   * Initialize the app on load.
-   */
-  async init() {
-    this.setStaticUI();
-    menuRenderer.renderShimmer(appConfig.SHIMMER_COUNT);
-  
-    try {
-      const data = await menuService.fetchMenuData();
-      const menus = data?.data?.menus || [];
-      
-      if (!menus.length) {
-                return menuRenderer.renderError('Failed to Load Menu', appConfig.API_ERROR_MESSAGE);
-      }
-  
-      this.setBanner(data.data.banner);
-      this.restaurants = this.groupMenusByRestaurant(menus);
-      this.selectedRestaurantSlug = this.restaurants[0]?.slug || null;
-  
-      this.renderTabs();
-      this.renderMenu(this.selectedRestaurantSlug);
-      } catch (err) {
-            console.error('Menu Load Failed:', err);
-            menuRenderer.renderError('Error', appConfig.API_ERROR_MESSAGE);
-    }
-  },
+    /**
+     * Initialize the app on load.
+     */
+    async init() {
+        this.setStaticUI();
+        menuRenderer.renderShimmer(appConfig.SHIMMER_COUNT);
 
-  /**
-   * Group all menu items by restaurant slug.
-   * @param {Array<Object>} menus
-   */
-  groupMenusByRestaurant(menus) {
-    const grouped = menus.reduce((acc, item) => {
-      const slug = item.restaurant_slug || 'unknown';
-      if (!acc[slug]) {
-        acc[slug] = {
-          slug,
-          name: item.restaurant_name || 'Unknown Restaurant',
-          items: [],
+        try {
+            const data = await menuService.fetchMenuData();
+            const menus = data?.data?.menus || [];
+
+            if (!menus.length) {
+                return menuRenderer.renderError('Failed to Load Menu', appConfig.EMPTY_DATA_ERROR_MESSAGE);
+            }
+
+            this.setBanner(data.data.banner);
+            this.restaurants = this.groupMenusByRestaurant(menus);
+            this.selectedRestaurantSlug = this.restaurants[0]?.slug || null;
+
+            this.renderTabs();
+            this.renderMenu(this.selectedRestaurantSlug);
+        } catch (err) {
+            this.clearUI()
+            menuRenderer.renderError('Service Unavailable', appConfig.API_ERROR_MESSAGE);
+        }
+    },
+
+
+    clearUI() {
+        document.querySelector('.header-bg')?.remove();
+        document.querySelector('.search-bar-container')?.remove();
+        document.querySelector('tabs-container')?.remove();
+    },
+
+
+    /**
+     * Group all menu items by restaurant slug.
+     * @param {Array<Object>} menus
+     */
+    groupMenusByRestaurant(menus) {
+        const grouped = menus.reduce((acc, item) => {
+            const slug = item.restaurant_slug || 'unknown';
+            if (!acc[slug]) {
+                acc[slug] = {
+                    slug,
+                    name: item.restaurant_name || 'Unknown Restaurant',
+                    items: [],
+                };
+            }
+            acc[slug].items.push({
+                title: item.name,
+                description: item.description,
+                price: item.price,
+                image: item.icon,
+                tags: item.tags,
+            });
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    },
+
+    /**
+     * Dynamically set the restaurant banner image.
+     * @param {string} bannerUrl
+     */
+    setBanner(bannerUrl) {
+        const url = bannerUrl;
+        if (!url) {
+            document.querySelector('.header-bg')?.remove();
+            return;
+        }
+
+        const header = document.querySelector('.header-bg');
+        const title = document.getElementById('app-title');
+        const subtitle = document.getElementById('app-subtitle');
+
+        const img = new Image();
+        img.onload = () => {
+            header.style.background = `url('${url}') center/cover no-repeat`;
+            title.style.display = subtitle.style.display = 'none';
         };
-      }
-      acc[slug].items.push({
-        title: item.name,
-        description: item.description,
-        price: item.price,
-        image: item.icon,
-        tags: item.tags,
-      });
-      return acc;
-    }, {});
+        img.onerror = () => {
+            title.style.display = subtitle.style.display = 'block';
+            console.warn('Banner image failed to load. Default styling kept.');
+        };
 
-    return Object.values(grouped);
-  },
+        img.src = url;
+    },
 
-  /**
-   * Dynamically set the restaurant banner image.
-   * @param {string} bannerUrl
-   */
-  setBanner(bannerUrl) {
-    const url = bannerUrl || appConfig.defaultBanner;
-    const header = document.querySelector('.header-bg');
-    const title = document.getElementById('app-title');
-    const subtitle = document.getElementById('app-subtitle');
+    /**
+     * Set static UI text and placeholders from config.
+     */
+    setStaticUI() {
+        const { APP_TITLE, APP_SUBTITLE, SEARCH_PLACEHOLDER } = appConfig;
+        document.getElementById('app-title').textContent = APP_TITLE;
+        document.getElementById('app-subtitle').textContent = APP_SUBTITLE;
+        document.getElementById('search-input').placeholder = SEARCH_PLACEHOLDER;
+    },
 
-    const img = new Image();
-    img.onload = () => {
-      header.style.background = `url('${url}') center/cover no-repeat`;
-      title.style.display = subtitle.style.display = 'none';
-    };
-    img.onerror = () => {
-      title.style.display = subtitle.style.display = 'block';
-      console.warn('Banner image failed to load. Default styling kept.');
-    };
+    /**
+     * Render horizontal restaurant tabs.
+     */
+    renderTabs() {
+        const container = document.getElementById('tabs-container');
+        container.innerHTML = '';
 
-    img.src = url;
-  },
+        this.restaurants.forEach(r => {
+            const isActive = r.slug === this.selectedRestaurantSlug;
+            const btn = document.createElement('button');
 
-  /**
-   * Set static UI text and placeholders from config.
-   */
-  setStaticUI() {
-    const { APP_TITLE, APP_SUBTITLE, SEARCH_PLACEHOLDER } = appConfig;
-    document.getElementById('app-title').textContent = APP_TITLE;
-    document.getElementById('app-subtitle').textContent = APP_SUBTITLE;
-    document.getElementById('search-input').placeholder = SEARCH_PLACEHOLDER;
-  },
+            btn.className = `tab-button ${isActive ? 'active' : ''}`;
+            btn.textContent = r.name;
+            btn.onclick = () => this.onTabSelect(r.slug);
 
-  /**
-   * Render horizontal restaurant tabs.
-   */
-  renderTabs() {
-    const container = document.getElementById('tabs-container');
-    container.innerHTML = '';
+            container.appendChild(btn);
+            if (isActive) {
+                queueMicrotask(() => btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
+            }
+        });
+    },
 
-    this.restaurants.forEach(r => {
-      const isActive = r.slug === this.selectedRestaurantSlug;
-      const btn = document.createElement('button');
+    /**
+     * Handles tab switching.
+     * @param {string} slug
+     */
+    onTabSelect(slug) {
+        if (this.selectedRestaurantSlug === slug) return;
 
-      btn.className = `tab-button ${isActive ? 'active' : ''}`;
-      btn.textContent = r.name;
-      btn.onclick = () => this.onTabSelect(r.slug);
+        this.selectedRestaurantSlug = slug;
+        document.getElementById('search-input').value = '';
 
-      container.appendChild(btn);
-      if (isActive) {
-        queueMicrotask(() => btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
-      }
-    });
-  },
+        this.renderTabs();
+        this.renderMenu(slug);
+    },
 
-  /**
-   * Handles tab switching.
-   * @param {string} slug
-   */
-  onTabSelect(slug) {
-    if (this.selectedRestaurantSlug === slug) return;
+    /**
+     * Render menu items of the selected restaurant.
+     * @param {string} restaurantSlug
+     */
+    renderMenu(restaurantSlug) {
+        const restaurant = this.restaurants.find(r => r.slug === restaurantSlug);
+        menuRenderer.renderMenuItems(restaurant?.items || []);
+    },
 
-    this.selectedRestaurantSlug = slug;
-    document.getElementById('search-input').value = '';
+    /**
+     * Enable search mode.
+     */
+    enterSearchMode() {
+        this.isSearching = true;
+        const appContainer = document.querySelector('.app-container');
+        const backButton = document.getElementById('back-button');
+        const searchInput = document.getElementById('search-input');
 
-    this.renderTabs();
-    this.renderMenu(slug);
-  },
+        appContainer.classList.add('search-active');
+        backButton.style.display = 'flex';
+        searchInput.value = '';
 
-  /**
-   * Render menu items of the selected restaurant.
-   * @param {string} restaurantSlug
-   */
-  renderMenu(restaurantSlug) {
-    const restaurant = this.restaurants.find(r => r.slug === restaurantSlug);
-    menuRenderer.renderMenuItems(restaurant?.items || []);
-  },
+        menuRenderer.renderMenuItems([]); // clear
+    },
 
-  /**
-   * Enable search mode.
-   */
-  enterSearchMode() {
-    this.isSearching = true;
-    const appContainer = document.querySelector('.app-container');
-    const backButton = document.getElementById('back-button');
-    const searchInput = document.getElementById('search-input');
+    /**
+     * Exit search mode and restore previous state.
+     */
+    exitSearchMode() {
+        this.isSearching = false;
+        const appContainer = document.querySelector('.app-container');
+        const backButton = document.getElementById('back-button');
+        const searchInput = document.getElementById('search-input');
 
-    appContainer.classList.add('search-active');
-    backButton.style.display = 'flex';
-    searchInput.value = '';
+        appContainer.classList.remove('search-active');
+        backButton.style.display = 'none';
+        searchInput.value = '';
+        searchInput.blur();
 
-    menuRenderer.renderMenuItems([]); // clear
-  },
-
-  /**
-   * Exit search mode and restore previous state.
-   */
-  exitSearchMode() {
-    this.isSearching = false;
-    const appContainer = document.querySelector('.app-container');
-    const backButton = document.getElementById('back-button');
-    const searchInput = document.getElementById('search-input');
-
-    appContainer.classList.remove('search-active');
-    backButton.style.display = 'none';
-    searchInput.value = '';
-    searchInput.blur();
-
-    const restaurant = this.restaurants.find(r => r.slug === this.selectedRestaurantSlug);
-    menuRenderer.renderMenuItems(restaurant?.items || []);
-  },
+        const restaurant = this.restaurants.find(r => r.slug === this.selectedRestaurantSlug);
+        menuRenderer.renderMenuItems(restaurant?.items || []);
+    },
 };
 
 // Initialize app when DOM is ready
