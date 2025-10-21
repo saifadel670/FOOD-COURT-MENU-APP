@@ -5,7 +5,7 @@
  */
 const appConfig = {
     // API Endpoint
-    API_URL: 'https://api.hariken.xyz/food-court-by-slug/dhali_fc_b_ra',
+    API_URL: 'https://api.hariken.xyz/food-court-by-slug',
 
     defaultBanner: '/assets/images/default-banner.jpg',
     

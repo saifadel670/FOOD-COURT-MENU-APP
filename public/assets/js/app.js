@@ -4,7 +4,7 @@
  * Coordinates fetching, rendering, and event handling.
  */
 import { appConfig } from './appConfig.js';
-import { menuService } from './MenuService.js';
+import { menuService } from './menuService.js';
 import { menuRenderer } from './menuRenderer.js';
 
 window.menuRenderer = menuRenderer; // Expose globally for inline events
@@ -20,24 +20,24 @@ const App = {
   async init() {
     this.setStaticUI();
     menuRenderer.renderShimmer(appConfig.SHIMMER_COUNT);
-
+  
     try {
       const data = await menuService.fetchMenuData();
       const menus = data?.data?.menus || [];
-
+      
       if (!menus.length) {
-        return menuRenderer.renderError('Failed to Load Menu', appConfig.API_ERROR_MESSAGE);
+                return menuRenderer.renderError('Failed to Load Menu', appConfig.API_ERROR_MESSAGE);
       }
-
+  
       this.setBanner(data.data.banner);
       this.restaurants = this.groupMenusByRestaurant(menus);
       this.selectedRestaurantSlug = this.restaurants[0]?.slug || null;
-
+  
       this.renderTabs();
       this.renderMenu(this.selectedRestaurantSlug);
-    } catch (err) {
-      console.error('Menu Load Failed:', err);
-      menuRenderer.renderError('Error', appConfig.API_ERROR_MESSAGE);
+      } catch (err) {
+            console.error('Menu Load Failed:', err);
+            menuRenderer.renderError('Error', appConfig.API_ERROR_MESSAGE);
     }
   },
 

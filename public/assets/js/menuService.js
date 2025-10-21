@@ -6,26 +6,35 @@
 import { appConfig } from './appConfig.js';
 
 const menuService = {
-    fetchMenuData: async function() {
-        console.log('DEBUG: Attempting to fetch from URL: ${appConfig.API_URL}');
-        try {
-            const response = await fetch(appConfig.API_URL);
+  fetchMenuData: async function() {
+    try {
+      const path = window.location.pathname;
+      let apiUrl = appConfig.API_URL;
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+      // Check if path matches /food-courts/{id}
+      const match = path.match(/^\/food-courts\/([a-zA-Z0-9_-]+)\/?$/);
+      if (match) {
+        const id = match[1];
+        apiUrl = `${appConfig.API_URL}/${id}`;
+      }
 
-            const rawData = await response.json();
-            
-            // Pass raw data through the parser model before returning
-            return rawData
+      console.log(`DEBUG: Fetching from URL: ${apiUrl}`);
 
-        } catch (error) {
-            console.error("Fetch API Error:", error);
-            // Return an empty, standardized structure on failure
-            return { restaurants: {}, items: [] };
-        }
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const rawData = await response.json();
+      return rawData
+
+    } catch (error) {
+      console.error("Fetch API Error:", error);
+      // Return an empty, standardized structure on failure
+      return { restaurants: {}, items: [] };
     }
+  }
 };
 
 export { menuService };
