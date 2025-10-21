@@ -4,6 +4,7 @@
  * * Uses STRICT parsing based on the provided JSON structure.
  */
 import { appConfig } from './appConfig.js';
+import { logEvent } from './analytics.js';
 
 const menuService = {
   fetchMenuData: async function() {
@@ -17,6 +18,11 @@ const menuService = {
         const id = match[1];
         apiUrl = `${appConfig.API_URL}/${id}`;
       }
+
+      logEvent('screen_view', {
+        screen_name: 'food-courts-details',
+        item_id: match?.[1] ?? 'unknown',
+      });
 
       console.log(`DEBUG: Fetching from URL: ${apiUrl}`);
 
